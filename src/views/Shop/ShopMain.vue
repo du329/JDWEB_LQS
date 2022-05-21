@@ -1,0 +1,276 @@
+<template>
+  <div class="shopMain">
+    <div class="category">
+      <div
+        :class="{
+          category__item: true,
+          'category__item--active': currentTab === item.tab,
+        }"
+        v-for="item in categoryList"
+        :key="item.name"
+        @click="
+          () => {
+            handleCategoryClick(item.tab);
+          }
+        "
+      >
+        {{ item.name }}
+      </div>
+    </div>
+    <div class="product">
+      <div class="product__item" v-for="item in productList" :key="item._id">
+        <div class="product__item__img">
+          <img :src="item.imgUrl" alt="" />
+        </div>
+        <div class="product__item__detail">
+          <h4 class="product__item__detail__title">
+            {{ item.name }}
+          </h4>
+          <p class="product__item__detail__sales">月售{{ item.sales }}件</p>
+          <p class="product__item__detail__price">
+            <span class="product__item__detail__price__yen"
+              >&yen;{{ item.price }}</span
+            >
+            <span class="product__item__detail__price__origin"
+              >&yen;{{ item.oldPrice }}</span
+            >
+          </p>
+        </div>
+        <div class="product__item__number">
+          <div
+            class="product__item__number__sub"
+            @click="
+              !cartList?.[shopId]?.[item._id]?.count
+                ? showToast('不能再减少了歪!')
+                : ASItemToCart(shopId, item._id, item, -1)
+            "
+          >
+            -
+          </div>
+          <div class="product__item__number__val">
+            {{ cartList?.[shopId]?.[item._id]?.count || 0 }}
+          </div>
+          <div
+            class="product__item__number__add"
+            @click="
+              cartList?.[shopId]?.[item._id]?.count > 99
+                ? showToast('不能再增加了歪!')
+                : ASItemToCart(shopId, item._id, item, 1)
+            "
+          >
+            +
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <transition
+    :duration="{ enter: 0, leave: 0 }"
+    enter-active-class="animate__animated animate__fadeIn"
+    leave-active-class="animate__animated animate__fadeOut"
+  >
+    <Toast v-if="show" :content="content" />
+  </transition>
+</template>
+
+<script>
+import { useRoute } from "vue-router";
+import { useStore } from "vuex";
+import { ref, reactive, toRefs } from "@vue/reactivity";
+import { get } from "../../utils/request";
+import { watchEffect } from "@vue/runtime-core";
+import Toast, { useToastEffect } from "../../components/Toast.vue";
+
+// category数据
+const categoryList = [
+  { name: "全部商品", tab: "all" },
+  { name: "秒杀", tab: "seckill" },
+  { name: "新鲜蔬菜", tab: "fruit" },
+];
+
+// category相关逻辑
+const useCategoryEffect = () => {
+  const currentTab = ref(categoryList[0].tab);
+
+  const handleCategoryClick = (tab) => {
+    currentTab.value = tab;
+  };
+  return { currentTab, handleCategoryClick };
+};
+
+// product相关逻辑
+const useProductEffect = (currentTab, shopId) => {
+  const data = reactive({ productList: [] });
+
+  // 请求数据
+  const getProductList = async () => {
+    const result = await get(`/shop/${shopId}/products`, {
+      tab: currentTab.value, // 依赖currentTab
+    });
+    data.productList = result.data;
+  };
+
+  // 自动感知代码依赖：点击category，current变化，watchEffect感知getProductList变化
+  watchEffect(() => {
+    getProductList();
+  });
+
+  const { productList } = toRefs(data);
+  return { productList };
+};
+
+// shopCart相关逻辑
+const useCartEffect = () => {
+  const store = useStore();
+  const route = useRoute();
+  const shopId = route.params.id;
+  const { cartList } = toRefs(store.state);
+
+  const ASItemToCart = (shopId, productId, productInfo, pro_count) => {
+    store.commit("ASItemToCart", { shopId, productId, productInfo, pro_count });
+  };
+
+  return {
+    cartList,
+    shopId,
+    ASItemToCart,
+  };
+};
+
+export default {
+  name: "ShopMain",
+  components: {
+    Toast,
+  },
+  setup() {
+    const { cartList, shopId, ASItemToCart } = useCartEffect();
+
+    const { currentTab, handleCategoryClick } = useCategoryEffect();
+    const { productList } = useProductEffect(currentTab, shopId);
+
+    const { show, content, showToast } = useToastEffect();
+
+    return {
+      categoryList,
+      currentTab,
+      productList,
+      handleCategoryClick,
+      cartList,
+      shopId,
+      ASItemToCart,
+
+      show,
+      content,
+      showToast,
+    };
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+@import "../../style/viriables.scss";
+@import "../../style/mixins.scss";
+.shopMain {
+  display: flex;
+  position: absolute;
+  top: 1.5rem;
+  left: 0;
+  right: 0;
+  bottom: 0.49rem;
+  .category {
+    overflow-y: auto;
+    width: 0.76rem;
+    background: #f1f1f1;
+    &__item {
+      height: 0.4rem;
+      line-height: 0.4rem;
+      text-align: center;
+      font-size: 0.14rem;
+      color: $shop-color;
+      &--active {
+        background: #fff;
+      }
+    }
+  }
+  .product {
+    flex: 1;
+    padding: 0.08rem 0.16rem;
+    overflow: auto;
+    &__item {
+      position: relative;
+      display: flex;
+      margin-bottom: 0.12rem;
+      padding-bottom: 0.12rem;
+      border-bottom: 0.01rem solid #f1f1f1;
+      &__img {
+        margin-right: 0.16rem;
+        width: 0.68rem;
+        height: 0.68rem;
+        img {
+          width: 100%;
+        }
+      }
+      &__detail {
+        flex: 1;
+        overflow: hidden;
+        &__title {
+          @include ellipsis;
+          margin: 0.06rem 0;
+          font-size: 0.14rem;
+          color: $shop-color;
+        }
+        &__sales {
+          margin-bottom: 0.06rem;
+          font-size: 0.12rem;
+          color: $shop-color;
+          line-height: 16px;
+        }
+        &__price {
+          &__yen {
+            margin-right: 00.06rem;
+            font-size: 0.14rem;
+            color: #e93b3b;
+            line-height: 20px;
+          }
+          &__origin {
+            font-size: 0.12rem;
+            color: #999999;
+            text-decoration: line-through;
+          }
+        }
+      }
+      &__number {
+        position: absolute;
+        margin-bottom: 0.12rem;
+        bottom: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        &__val {
+          margin: 0 0.1rem;
+          font-size: 0.14rem;
+          color: $shop-color;
+          line-height: 16px;
+        }
+        &__add,
+        &__sub {
+          text-align: center;
+          width: 0.2rem;
+          height: 0.2rem;
+          line-height: 0.18rem;
+          border-radius: 50%;
+          font-size: 0.2rem;
+        }
+        &__add {
+          color: #f1f1f1;
+          background: #0091ff;
+        }
+        &__sub {
+          color: #666666;
+          border: 0.01rem solid #666666;
+        }
+      }
+    }
+  }
+}
+</style>
