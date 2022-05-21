@@ -48,7 +48,7 @@
             -
           </div>
           <div class="product__item__number__val">
-            {{ cartList?.[shopId]?.[item._id]?.count || 0 }}
+            {{ cartList?.[shopId]?.[item._id]?.count || 0.0 }}
           </div>
           <div
             class="product__item__number__add"
@@ -74,14 +74,13 @@
 </template>
 
 <script>
-import { useRoute } from "vue-router";
-import { useStore } from "vuex";
 import { ref, reactive, toRefs } from "@vue/reactivity";
 import { get } from "../../utils/request";
 import { watchEffect } from "@vue/runtime-core";
 import Toast, { useToastEffect } from "../../components/Toast.vue";
+import { useCartEffect } from "./useCartEffect";
 
-// category数据
+// category静态数据
 const categoryList = [
   { name: "全部商品", tab: "all" },
   { name: "秒杀", tab: "seckill" },
@@ -98,43 +97,24 @@ const useCategoryEffect = () => {
   return { currentTab, handleCategoryClick };
 };
 
-// product相关逻辑
+// productList相关逻辑
 const useProductEffect = (currentTab, shopId) => {
-  const data = reactive({ productList: [] });
-
   // 请求数据
+  const data = reactive({ productList: [] });
   const getProductList = async () => {
     const result = await get(`/shop/${shopId}/products`, {
       tab: currentTab.value, // 依赖currentTab
     });
     data.productList = result.data;
   };
-
-  // 自动感知代码依赖：点击category，current变化，watchEffect感知getProductList变化
+  // 自动感知代码依赖：点击category，currentTab变化，watchEffect感知getProductList变化
   watchEffect(() => {
     getProductList();
   });
-
   const { productList } = toRefs(data);
+  // toRefs:将响应式对象转换为普通对象，其中结果对象的每个 property 都是指向原始对象相应 property 的ref
+  // https://v3.cn.vuejs.org/api/refs-api.html#torefs
   return { productList };
-};
-
-// shopCart相关逻辑
-const useCartEffect = () => {
-  const store = useStore();
-  const route = useRoute();
-  const shopId = route.params.id;
-  const { cartList } = toRefs(store.state);
-
-  const ASItemToCart = (shopId, productId, productInfo, pro_count) => {
-    store.commit("ASItemToCart", { shopId, productId, productInfo, pro_count });
-  };
-
-  return {
-    cartList,
-    shopId,
-    ASItemToCart,
-  };
 };
 
 export default {
@@ -143,22 +123,22 @@ export default {
     Toast,
   },
   setup() {
+    // 加减商品数量
     const { cartList, shopId, ASItemToCart } = useCartEffect();
-
+    // 根据当前currentTab请求对应数据
     const { currentTab, handleCategoryClick } = useCategoryEffect();
     const { productList } = useProductEffect(currentTab, shopId);
-
+    // 吐司
     const { show, content, showToast } = useToastEffect();
 
     return {
       categoryList,
-      currentTab,
-      productList,
-      handleCategoryClick,
       cartList,
       shopId,
       ASItemToCart,
-
+      currentTab,
+      productList,
+      handleCategoryClick,
       show,
       content,
       showToast,
@@ -228,7 +208,7 @@ export default {
         &__price {
           &__yen {
             margin-right: 00.06rem;
-            font-size: 0.14rem;
+            font-size: 0.16rem;
             color: #e93b3b;
             line-height: 20px;
           }

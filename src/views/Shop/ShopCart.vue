@@ -2,36 +2,77 @@
   <div class="shopCart">
     <div class="shopCart__img">
       <span class="icon"> &#xe6ad;</span>
-      <span class="proNum">{{ 0 }}</span>
+      <span class="proNum">
+        {{ (CartData.allCount > 99 ? "99+" : CartData.allCount) || 0 }}
+      </span>
     </div>
-    <div class="shopCart__content">总计：<span>&yen;128</span></div>
+    <div class="shopCart__total">
+      总计：
+      <span>
+        &yen;{{ CartData.total ? Math.abs(CartData.total).toFixed(2) : 0 }}
+      </span>
+    </div>
     <div class="toCheckOut">去结算</div>
   </div>
+  <ShopCartDetail :allCheck="allCheck" />
 </template>
 
 <script>
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
+import { ref } from "@vue/reactivity";
+import ShopCartDetail from "./ShopCartDetail.vue";
+
+// 计算proAllCount、proTotal、以及判断全选
+const useCartDataEffect = () => {
+  const route = useRoute();
+  const store = useStore();
+  const shopId = route.params.id;
+  const { cartList } = store.state;
+
+  let CartData = computed(() => {
+    const proList = cartList[shopId];
+    let productData = { allCount: 0, total: 0 };
+
+    if (proList) {
+      for (let i in proList) {
+        const product = proList[i];
+        if (product.check) {
+          // 计算总数量和总价
+          productData.allCount += product.count;
+          productData.total += product.count * product.price;
+        }
+      }
+    }
+    return productData;
+  });
+
+  const ALLCheck = computed(() => {
+    let allCheck = ref(false);
+    const proList = cartList[shopId];
+    allCheck.value = true;
+    for (let i in proList) {
+      const product = proList[i];
+      if (product.check === false) {
+        allCheck.value = false;
+      }
+    }
+    return allCheck;
+  });
+
+  return { CartData, ALLCheck };
+};
+
 export default {
   name: "ShopCart",
+  components: {
+    ShopCartDetail,
+  },
   setup() {
-    const route = useRoute();
-    const store = useStore();
+    const { CartData, allCheck } = useCartDataEffect();
 
-    let pro_Num = computed(() => {
-      let count = 0;
-      for (const item in store.state.cartList[route.params.id]) {
-        count += item.count;
-      }
-      console.log(count);
-      return count;
-    });
-
-    // let total = computed(() => {
-
-    // });
-    return { pro_Num };
+    return { CartData, allCheck };
   },
 };
 </script>
@@ -67,7 +108,7 @@ export default {
       border-radius: 50%;
     }
   }
-  &__content {
+  &__total {
     flex: 1;
     height: 100%;
     line-height: 0.49rem;
