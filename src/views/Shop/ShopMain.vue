@@ -40,22 +40,22 @@
           <div
             class="product__item__number__sub"
             @click="
-              !cartList?.[shopId]?.[item._id]?.count
+              !getCartListProductCount(item._id)
                 ? showToast('不能再减少了歪!')
-                : ASItemToCart(shopId, item._id, item, -1)
+                : ASItemToCart(shopId, shopName, item, -1)
             "
           >
             -
           </div>
           <div class="product__item__number__val">
-            {{ cartList?.[shopId]?.[item._id]?.count || 0.0 }}
+            {{ getCartListProductCount(item._id) || 0.0 }}
           </div>
           <div
             class="product__item__number__add"
             @click="
-              cartList?.[shopId]?.[item._id]?.count > 99
+              getCartListProductCount(item._id) > 99
                 ? showToast('不能再增加了歪!')
-                : ASItemToCart(shopId, item._id, item, 1)
+                : ASItemToCart(shopId, shopName, item, 1)
             "
           >
             +
@@ -119,6 +119,7 @@ const useProductEffect = (currentTab, shopId) => {
 
 export default {
   name: "ShopMain",
+  props: ["shopName"],
   components: {
     Toast,
   },
@@ -131,6 +132,11 @@ export default {
     // 吐司
     const { show, content, showToast } = useToastEffect();
 
+    // 获取产品数量：
+    const getCartListProductCount = (proID) => {
+      return cartList?.[shopId]?.productList?.[proID]?.count;
+    };
+
     return {
       categoryList,
       cartList,
@@ -139,6 +145,7 @@ export default {
       currentTab,
       productList,
       handleCategoryClick,
+      getCartListProductCount,
       show,
       content,
       showToast,

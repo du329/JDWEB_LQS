@@ -1,20 +1,26 @@
 <template>
+  <ShopCartDetail :allCheck="allCheck" v-if="cartShow" />
+  <div class="mask" v-if="cartShow" @click="handleCartShow"></div>
   <div class="shopCart">
-    <div class="shopCart__img">
-      <span class="icon"> &#xe6ad;</span>
+    <div class="shopCart__img" @click="handleCartShow">
+      <span class="iconfont">&#xe6ad;</span>
       <span class="proNum">
-        {{ (CartData.allCount > 99 ? "99+" : CartData.allCount) || 0 }}
+        {{ (cartData.allCount > 99 ? "99+" : cartData.allCount) || 0 }}
       </span>
     </div>
+
     <div class="shopCart__total">
-      总计：
-      <span>
-        &yen;{{ CartData.total ? Math.abs(CartData.total).toFixed(2) : 0 }}
-      </span>
+      <div v-if="cartData.allCount === 0">购物车空空如也~</div>
+      <div v-else>
+        总计：
+        <span>
+          &yen;{{ cartData.total ? Math.abs(cartData.total).toFixed(2) : 0 }}
+        </span>
+      </div>
     </div>
+
     <div class="toCheckOut">去结算</div>
   </div>
-  <ShopCartDetail :allCheck="allCheck" />
 </template>
 
 <script>
@@ -24,23 +30,21 @@ import { useStore } from "vuex";
 import { ref } from "@vue/reactivity";
 import ShopCartDetail from "./ShopCartDetail.vue";
 
-// 计算proAllCount、proTotal、以及判断全选
 const useCartDataEffect = () => {
   const route = useRoute();
   const store = useStore();
   const shopId = route.params.id;
   const { cartList } = store.state;
-
-  let CartData = computed(() => {
-    const proList = cartList[shopId];
+ 
+  let cartData = computed(() => {
+    const productList  = cartList[shopId]?.productList || {};
     let productData = { allCount: 0, total: 0 };
-
-    if (proList) {
-      for (let i in proList) {
-        const product = proList[i];
+    if (Object.keys(productList).length) {
+      for (let i in productList) {
+        const product = productList[i];
+        productData.allCount += product.count;
         if (product.check) {
           // 计算总数量和总价
-          productData.allCount += product.count;
           productData.total += product.count * product.price;
         }
       }
@@ -48,20 +52,33 @@ const useCartDataEffect = () => {
     return productData;
   });
 
-  const ALLCheck = computed(() => {
-    let allCheck = ref(false);
-    const proList = cartList[shopId];
-    allCheck.value = true;
-    for (let i in proList) {
-      const product = proList[i];
-      if (product.check === false) {
-        allCheck.value = false;
+  // computed的每一个计算属性都会被缓存起来，
+  // 只要计算属性所依赖的属性发生变化，计算属性就会重新执行，视图也会更新。
+
+  let allCheck = computed(() => {
+    let flag = false;
+    const productList = cartList[shopId]?.productList;
+    if (Object.keys(productList).length) {
+      console.log(Object.keys(productList));
+      flag = true;
+      for (let i in productList) {
+        const product = productList[i];
+        if (product.count > 0 && !product.check) {
+          flag = false;
+        }
       }
     }
-    return allCheck;
+    return flag;
   });
+  return { cartData, allCheck };
+};
 
-  return { CartData, ALLCheck };
+const useCartShowEffect = () => {
+  let cartShow = ref(false);
+  const handleCartShow = () => {
+    cartShow.value = !cartShow.value;
+  };
+  return { cartShow, handleCartShow };
 };
 
 export default {
@@ -70,9 +87,12 @@ export default {
     ShopCartDetail,
   },
   setup() {
-    const { CartData, allCheck } = useCartDataEffect();
+    // proAllCount、proTotal、全选
+    const { cartData, allCheck } = useCartDataEffect();
+    // 购物车显示与隐藏
+    const { cartShow, handleCartShow } = useCartShowEffect();
 
-    return { CartData, allCheck };
+    return { cartData, allCheck, cartShow, handleCartShow };
   },
 };
 </script>
@@ -90,7 +110,7 @@ export default {
   &__img {
     width: 0.76rem;
     text-align: center;
-    .icon {
+    .iconfont {
       font-size: 0.3rem;
       color: #0091ff;
     }
@@ -128,5 +148,13 @@ export default {
     color: white;
     background: #4fb0f9;
   }
+}
+.mask {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
 }
 </style>

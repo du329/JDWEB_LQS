@@ -1,7 +1,7 @@
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
-// shopCart相关逻辑
+// shopCart 加减商品相关逻辑
 export const useCartEffect = () => {
     const store = useStore();
     const route = useRoute();
@@ -9,10 +9,9 @@ export const useCartEffect = () => {
     const { cartList } = store.state;
 
     // 加减商品数量
-    const ASItemToCart = (shopId, productId, productInfo, pro_count) => {
-        store.commit("ASItemToCart", { shopId, productId, productInfo, pro_count });
+    const ASItemToCart = (shopId, shopName = '', productInfo, pro_count) => {
+        store.commit("ASItemToCart", { shopId, shopName, productInfo, pro_count });
     };
-
     return {
         cartList,
         shopId,

@@ -1,6 +1,6 @@
 <template>
   <div class="search">
-    <div class="icon">&#xe752;</div>
+    <div class="iconfont">&#xe752;</div>
     <input type="text" :placeholder="placeholder" />
   </div>
 </template>
@@ -23,7 +23,7 @@ export default {
   align-items: center;
   background: $searchColor;
   border-radius: 0.16rem;
-  .icon {
+  .iconfont {
     margin-right: 0.1rem;
     font-size: 0.16rem;
   }

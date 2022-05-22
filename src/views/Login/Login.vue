@@ -44,7 +44,6 @@ import { useRouter } from "vue-router"; // 路由插件
 import { reactive, toRefs } from "@vue/reactivity";
 import { post } from "../../utils/request"; // axios请求函数
 import Toast, { useToastEffect } from "../../components/Toast"; // 自定义弹窗
-// import 'animate.css'
 
 // 处理登录
 const useLoginEffect = (showToast) => {

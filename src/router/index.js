@@ -1,15 +1,11 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-
-const Home = () => import(/* webpackChunkName: "Home" */ '../views/Home/Home')
 const Login = () => import(/* webpackChunkName: "Login" */ '../views/Login/Login')
 const Register = () => import(/* webpackChunkName: "Register" */ '../views/Register/Register')
+const Home = () => import(/* webpackChunkName: "Home" */ '../views/Home/Home')
+const Cart = () => import(/* webpackChunkName: "Cart" */ '../views/Cart/Cart')
 const Shop = () => import(/* webpackChunkName: "Shop" */ '../views/Shop/Shop')
 
 const routes = [{
-  path: '/Home',
-  name: 'Home',
-  component: Home,
-}, {
   path: '/Login',
   name: 'Login',
   component: Login,
@@ -36,6 +32,14 @@ const routes = [{
     }
   }
 }, {
+  path: '/Home',
+  name: 'Home',
+  component: Home,
+},{
+  path: '/Cart',
+  name: 'Cart',
+  component: Cart,
+},{
   path: '/Shop/:id',
   name: 'Shop',
   component: Shop,

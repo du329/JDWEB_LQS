@@ -1,8 +1,8 @@
 <template>
   <div class="areaAnew">
-    <div class="icon area">&#xe619;</div>
+    <div class="iconfont area">&#xe619;</div>
     <div class="areaAnew_text">北京理工大学国防科技园2号楼10层</div>
-    <div class="icon news">&#xe629;</div>
+    <div class="iconfont news">&#xe629;</div>
   </div>
 
   <div class="searchBox">
@@ -101,7 +101,7 @@ export default {
   line-height: 0.22rem;
   font-size: 0.16rem;
   color: $content-fontcolor;
-  .icon {
+  .iconfont {
     font-size: 0.2rem;
   }
   .area {

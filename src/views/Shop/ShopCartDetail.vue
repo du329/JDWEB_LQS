@@ -2,23 +2,23 @@
   <div class="shopCart__detail">
     <div class="shopCart__detail__top">
       <span
-        :class="{ icon: true, icon88: allCheck, all: true }"
-        @click="handleAllCheck(shopId,allCheck)"
-        >{{ "&#xeb88;" }}
+        :class="{ iconfont: true, icon88: allCheck, all: true }"
+        @click="handleAllCheck(shopId, allCheck)"
+        >{{ allCheck ? "&#xeb88;" : "&#xeb8d;" }}
       </span>
       <span>全选</span>
       <span class="clearCart" @click="handleClearCart(shopId)">清空购物车</span>
     </div>
     <div class="product">
-      <template v-for="item in cartList[shopId]" :key="item._id">
+      <template v-for="item in cartList[shopId].productList" :key="item._id">
         <div class="product__item" v-if="item.count > 0">
           <div
             class="product__item__check"
-            @click="handleProductCheck(item._id)"
+            @click="handleProductCheck(shopId, item._id)"
           >
-            <span :class="{ icon: true, icon88: item.check }">{{
-              "&#xeb88;"
-            }}</span>
+            <span :class="{ iconfont: true, icon88: item.check }">
+              {{ item.check ? "&#xeb88;" : "&#xeb8d;" }}
+            </span>
           </div>
           <div class="product__item__img">
             <img :src="item.imgUrl" alt="" />
@@ -42,7 +42,7 @@
               @click="
                 !item.count
                   ? showToast('不能再减少了歪!')
-                  : ASItemToCart(shopId, item._id, item, -1)
+                  : ASItemToCart(shopId, undefined, item, -1)
               "
             >
               -
@@ -55,7 +55,7 @@
               @click="
                 item.count > 99
                   ? showToast('不能再增加了歪!')
-                  : ASItemToCart(shopId, item._id, item, 1)
+                  : ASItemToCart(shopId, undefined, item, 1)
               "
             >
               +
@@ -78,34 +78,39 @@
 import { useCartEffect } from "./useCartEffect";
 import Toast, { useToastEffect } from "../../components/Toast.vue";
 import { useStore } from "vuex";
-// import { useCartDataEffect } from "./ShopCart.vue";
+
+const useCartDetailEffect = () => {
+  const store = useStore();
+  // 单选
+  const handleProductCheck = (shopId, productId) => {
+    store.commit("changeProductState", { shopId, productId });
+  };
+
+  // 全选
+  const handleAllCheck = (shopId, allCheck) => {
+    store.commit("allCheck", { shopId, allCheck });
+  };
+
+  // 清空购物车
+  const handleClearCart = (shopId) => {
+    store.commit("clearCart", { shopId });
+  };
+  return { handleProductCheck, handleAllCheck, handleClearCart };
+};
 
 export default {
   name: "ShopCartDetail",
-  props:['allCheck'],
+  props: ["allCheck"],
   components: {
     Toast,
   },
   setup() {
-    const store = useStore();
+    // 加减商品数量
     const { cartList, shopId, ASItemToCart } = useCartEffect();
+    // 单选、全选、清空购物车
+    const { handleProductCheck, handleAllCheck, handleClearCart } =
+      useCartDetailEffect();
     const { show, content, showToast } = useToastEffect();
-
-    // 选中
-    const handleProductCheck = (productId) => {
-      store.commit("changeProductState", { shopId, productId });
-    };
-
-    // 全选
-    const handleAllCheck = (shopId,allCheck) => {
-      store.commit("allCheck", { shopId,allCheck });
-    };
-
-    // 清空购物车
-    const handleClearCart = (shopId) => {
-      store.commit("clearCart", { shopId });
-    };
-
     return {
       cartList,
       shopId,
@@ -113,7 +118,6 @@ export default {
       handleProductCheck,
       handleAllCheck,
       handleClearCart,
-      //   allCheck,
       show,
       content,
       showToast,
@@ -129,7 +133,6 @@ export default {
   z-index: 1;
   position: absolute;
   background: white;
-  //   background: rgba($color: #000, $alpha: 0.0);
   bottom: 0.49rem;
   left: 0;
   right: 0;
@@ -144,6 +147,7 @@ export default {
       float: left;
       margin-right: 0.09rem;
       font-size: 0.2rem;
+      color: #e6e6e6;
     }
     .clearCart {
       float: right;
@@ -161,6 +165,7 @@ export default {
       &__check {
         margin-right: 0.164rem;
         font-size: 0.2rem;
+        color: #e6e6e6;
       }
       &__img {
         margin-right: 0.16rem;
@@ -195,7 +200,7 @@ export default {
       }
       &__number {
         position: absolute;
-        margin: 0 0.18rem 0.12rem 0;
+        margin: 0 0.18rem 0.25rem 0;
         bottom: 0;
         right: 0;
         display: flex;

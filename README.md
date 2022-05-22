@@ -1,5 +1,7 @@
 # JD_lqs
 
+## vuex\router
+
 ## 自定义Hook函数：
 
 把setup函数中使用Copmosition API进行封装，让功能相关的代码有序的组织在一起，使setup中的逻辑（流程）更清晰易懂
@@ -15,6 +17,7 @@
 ![](image/README/1652927238883.png)
 
 组件合理拆分、localStorage验证登录、Fastmock模拟后台
+
 
 响应式数据替换对象：
 

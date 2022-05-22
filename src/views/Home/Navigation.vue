@@ -4,12 +4,14 @@
       v-for="item in navigationList"
       :key="item.icon"
       :class="{
-        Navigation__item: true,
+        'Navigation__item' : true,
         'Navigation__item--active': item.index === 0 ? true : false,
       }"
     >
-      <div class="icon" v-html="item.icon"></div>
-      <div class="text">{{ item.text }}</div>
+      <router-link :to="{ name: item.to }">
+        <div class="iconfont" v-html="item.icon"></div>
+        <div class="text">{{ item.text }}</div>
+      </router-link>
     </div>
   </div>
 </template>
@@ -19,8 +21,8 @@ export default {
   name: "Navigation",
   setup() {
     let navigationList = [
-      { index: 0, icon: "&#xe612;", text: "首页" },
-      { index: 1, icon: "&#xe628;", text: "购物车" },
+      { index: 0, icon: "&#xe612;", text: "首页", to: "Home" },
+      { index: 1, icon: "&#xe628;", text: "购物车", to: "Cart" },
       { index: 2, icon: "&#xe606;", text: "订单" },
       { index: 3, icon: "&#xe613;", text: "我的" },
     ];
@@ -49,10 +51,12 @@ export default {
     &--active {
       color: #1fa4fc;
     }
-    .icon {
+    .iconfont {
       margin: 0.07rem 0 0.02rem 0;
-
       font-size: 0.2rem;
+    }
+    a{
+      color: #1fa4fc;
     }
     .text {
       font-size: 0.2rem;
