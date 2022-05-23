@@ -163,6 +163,9 @@ export default {
       text-align: center;
       font-size: 0.14rem;
       color: $color;
+      a {
+        color: $color;
+      }
       .gapLine {
         margin: 0 0.12rem;
       }

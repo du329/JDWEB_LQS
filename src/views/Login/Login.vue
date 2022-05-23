@@ -54,11 +54,11 @@ const useLoginEffect = (showToast) => {
   const handleLogin = async () => {
     // 用户名、密码验证
     // let userVerify | pwdVerify = /^[a-zA-Z0-9_-]{11,16}$/;
-    if (username.value === '') {
+    if (username.value === "") {
       showToast("请输入用户名!");
       return;
     }
-    if (password.value === '') {
+    if (password.value === "") {
       showToast("请输入密码!");
       return;
     }
@@ -145,6 +145,9 @@ export default {
       text-align: center;
       font-size: 0.14rem;
       color: $color;
+      a {
+        color: $color;
+      }
       .gapLine {
         margin: 0 0.12rem;
       }

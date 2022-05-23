@@ -7,7 +7,7 @@
 <script>
 import StaticArea from "./StaticArea";
 import NearByShops from "./NearByShops";
-import Navigation from "./Navigation";
+import Navigation from "../../components/Navigation";
 
 export default {
   name: "Home",

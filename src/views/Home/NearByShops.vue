@@ -45,6 +45,9 @@ export default {
 <style lang="scss" scoped>
 .nearByShops {
   padding: 0.18rem 0.18rem 0.49rem;
+  a {
+    color: #333;
+  }
   h2 {
     margin-bottom: 0.14rem;
     font-size: 0.18rem;

@@ -18,60 +18,23 @@
         </span>
       </div>
     </div>
-
-    <div class="toCheckOut">去结算</div>
+    <div class="toCheckOut" @click="handleToCheckOut">去结算</div>
   </div>
+  <transition
+    :duration="{ enter: 0, leave: 0 }"
+    enter-active-class="animate__animated animate__fadeIn"
+    leave-active-class="animate__animated animate__fadeOut"
+  >
+    <Toast v-if="show" :content="content" />
+  </transition>
 </template>
 
 <script>
-import { computed } from "vue";
-import { useRoute } from "vue-router";
-import { useStore } from "vuex";
+import { useRoute, useRouter } from "vue-router";
 import { ref } from "@vue/reactivity";
 import ShopCartDetail from "./ShopCartDetail.vue";
-
-const useCartDataEffect = () => {
-  const route = useRoute();
-  const store = useStore();
-  const shopId = route.params.id;
-  const { cartList } = store.state;
- 
-  let cartData = computed(() => {
-    const productList  = cartList[shopId]?.productList || {};
-    let productData = { allCount: 0, total: 0 };
-    if (Object.keys(productList).length) {
-      for (let i in productList) {
-        const product = productList[i];
-        productData.allCount += product.count;
-        if (product.check) {
-          // 计算总数量和总价
-          productData.total += product.count * product.price;
-        }
-      }
-    }
-    return productData;
-  });
-
-  // computed的每一个计算属性都会被缓存起来，
-  // 只要计算属性所依赖的属性发生变化，计算属性就会重新执行，视图也会更新。
-
-  let allCheck = computed(() => {
-    let flag = false;
-    const productList = cartList[shopId]?.productList;
-    if (Object.keys(productList).length) {
-      console.log(Object.keys(productList));
-      flag = true;
-      for (let i in productList) {
-        const product = productList[i];
-        if (product.count > 0 && !product.check) {
-          flag = false;
-        }
-      }
-    }
-    return flag;
-  });
-  return { cartData, allCheck };
-};
+import Toast, { useToastEffect } from "../../components/Toast.vue";
+import { useCartDataEffect } from "../../effects/useCartDataEffect";
 
 const useCartShowEffect = () => {
   let cartShow = ref(false);
@@ -81,18 +44,55 @@ const useCartShowEffect = () => {
   return { cartShow, handleCartShow };
 };
 
+const useCheckOutEffect = (checkedProductList, showToast, shopId) => {
+  const router = useRouter();
+  const handleToCheckOut = () => {
+    // Computed Ref Impl ！！！
+    if (Object.keys(checkedProductList.value).length) {  
+      router.push({ name: "ConfirmOrder", params: { id: shopId } });
+    } else {
+      showToast("请选择商品!");
+    }
+  };
+  return { handleToCheckOut };
+};
+
 export default {
   name: "ShopCart",
   components: {
     ShopCartDetail,
+    Toast,
   },
   setup() {
-    // proAllCount、proTotal、全选
-    const { cartData, allCheck } = useCartDataEffect();
+    const route = useRoute();
+    const shopId = route.params.id;
     // 购物车显示与隐藏
     const { cartShow, handleCartShow } = useCartShowEffect();
+    // proAllCount、proTotal、全选、结算判断
+    const { cartData, allCheck, checkedProductList } = useCartDataEffect(
+      shopId,
+      handleCartShow
+    );
+    // 吐司
+    const { show, content, showToast } = useToastEffect();
+    // 判断订单跳转
+    const { handleToCheckOut } = useCheckOutEffect(
+      checkedProductList,
+      showToast,
+      shopId
+    );
 
-    return { cartData, allCheck, cartShow, handleCartShow };
+    return {
+      shopId,
+      cartShow,
+      handleCartShow,
+      cartData,
+      allCheck,
+      show,
+      content,
+      showToast,
+      handleToCheckOut,
+    };
   },
 };
 </script>

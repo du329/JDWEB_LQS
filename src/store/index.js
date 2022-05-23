@@ -7,9 +7,9 @@ const setCartListToLS = (state) => {
 }
 
 const getCartListFromLS = () => {
-  if (localStorage.cartList) {
+  try {
     return JSON.parse(localStorage.cartList);
-  } else {
+  } catch {
     return {};
   }
   //{shopId:{shopName:'',productList:{productId:{}},}}
@@ -23,16 +23,18 @@ export default Vuex.createStore({
     // 加减 商品数量
     ASItemToCart(state, payLoad) {
       const { shopId, shopName, productInfo, pro_count } = payLoad;
-      let shop = state.cartList[shopId] || { shopName:shopName, productList: {} }; // 某个商店中productList
+      let shop = state.cartList[shopId] || { shopName: shopName, productList: {} }; // 某个商店中productList
       let product = shop.productList[productInfo._id]; // 某个产品
-      if (!product) { product = productInfo; product.count = 0; product.check = false; }
+      if (!product) { product = productInfo; product.count = 0; product.check = true; }
 
       product.count += pro_count; //单个商品数
 
-      // if(product.count === 0){ shop.productList.remove('productInfo._id')}
       // 商品数量为0，删除该商品对象
-      shop.productList[productInfo._id] = product;
-      state.cartList[shopId] = shop;
+      if (product.count === 0) { delete shop.productList[productInfo._id]; }
+      else {
+        shop.productList[productInfo._id] = product;
+        state.cartList[shopId] = shop;
+      }
       setCartListToLS(state)
     },
 

@@ -18,7 +18,14 @@
 
 组件合理拆分、localStorage验证登录、Fastmock模拟后台
 
-
 响应式数据替换对象：
 
 ![](image/README/1652955599243.png)
+
+
+
+## 计算属性return的数据直接使用，vue内部解析，
+
+computedRefImpl:  使用某个计算属性需要  computed.value
+
+![](image/README/1653313436905.png)

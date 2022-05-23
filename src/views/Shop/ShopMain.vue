@@ -78,7 +78,7 @@ import { ref, reactive, toRefs } from "@vue/reactivity";
 import { get } from "../../utils/request";
 import { watchEffect } from "@vue/runtime-core";
 import Toast, { useToastEffect } from "../../components/Toast.vue";
-import { useCartEffect } from "./useCartEffect";
+import { useCartProASEffect } from "./useCartProASEffect";
 
 // category静态数据
 const categoryList = [
@@ -125,7 +125,7 @@ export default {
   },
   setup() {
     // 加减商品数量
-    const { cartList, shopId, ASItemToCart } = useCartEffect();
+    const { cartList, shopId, ASItemToCart } = useCartProASEffect();
     // 根据当前currentTab请求对应数据
     const { currentTab, handleCategoryClick } = useCategoryEffect();
     const { productList } = useProductEffect(currentTab, shopId);

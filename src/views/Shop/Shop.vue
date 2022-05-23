@@ -11,31 +11,22 @@
     </div>
   </div>
   <ShopMain :shopName="item.name" />
-  <ShopCart/>
+  <ShopCart />
 </template>
 
 <script>
-import { useRouter, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import { reactive, toRefs } from "@vue/reactivity";
 import { get } from "../../utils/request";
 import Search from "../../components/Search.vue";
 import ShopInfo from "../../components/ShopInfo.vue";
 import ShopMain from "./ShopMain.vue";
 import ShopCart from "./ShopCart.vue";
-
-// 回退
-const useBackEffect = () => {
-  const router = useRouter();
-  const handleBack = () => {
-    router.back();
-  };
-  return handleBack;
-};
+import { useBackEffect } from "../../effects/useBackEffect";
 
 // 获取当前商铺详情并设置商铺名
 const useShopInfoEffect = () => {
   const route = useRoute();
-
   const data = reactive({ item: {} });
   // const data2 = { item: {} };  响应式--数据驱动
   // let item = ref({});
@@ -66,7 +57,7 @@ export default {
   },
   setup() {
     const placeholder = "请输入商品名称搜索";
-    const handleBack = useBackEffect();
+    const { handleBack } = useBackEffect();
     const { item } = useShopInfoEffect();
     return { placeholder, item, handleBack };
   },

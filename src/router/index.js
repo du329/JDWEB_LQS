@@ -4,8 +4,12 @@ const Register = () => import(/* webpackChunkName: "Register" */ '../views/Regis
 const Home = () => import(/* webpackChunkName: "Home" */ '../views/Home/Home')
 const Cart = () => import(/* webpackChunkName: "Cart" */ '../views/Cart/Cart')
 const Shop = () => import(/* webpackChunkName: "Shop" */ '../views/Shop/Shop')
+const Order = () => import(/* webpackChunkName: "Order" */ '../views/Order/Order')
+const ConfirmOrder = () => import(/* webpackChunkName: "ConfirmOrder" */ '../views/Order/ConfirmOrder')
+const Mine = () => import(/* webpackChunkName: "Mine" */ '../views/Mine/Mine')
 
-const routes = [{
+const routes = [
+  {
   path: '/Login',
   name: 'Login',
   component: Login,
@@ -35,16 +39,27 @@ const routes = [{
   path: '/Home',
   name: 'Home',
   component: Home,
-},{
+}, {
   path: '/Cart',
   name: 'Cart',
   component: Cart,
-},{
+}, {
   path: '/Shop/:id',
   name: 'Shop',
   component: Shop,
-},
-]
+},{
+  path: '/Order',
+  name: 'Order',
+  component: Order,
+},{
+  path: '/ConfirmOrder/:id',
+  name: 'ConfirmOrder',
+  component: ConfirmOrder,
+},{
+  path: '/Mine',
+  name: 'Mine',
+  component: Mine,
+}]
 
 const router = createRouter({
   history: createWebHashHistory(),

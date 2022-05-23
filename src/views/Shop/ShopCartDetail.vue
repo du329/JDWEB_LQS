@@ -10,8 +10,8 @@
       <span class="clearCart" @click="handleClearCart(shopId)">清空购物车</span>
     </div>
     <div class="product">
-      <template v-for="item in cartList[shopId].productList" :key="item._id">
-        <div class="product__item" v-if="item.count > 0">
+      <template v-for="item in cartList[shopId]?.productList" :key="item._id">
+        <div class="product__item">
           <div
             class="product__item__check"
             @click="handleProductCheck(shopId, item._id)"
@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import { useCartEffect } from "./useCartEffect";
+import { useCartProASEffect } from "./useCartProASEffect";
 import Toast, { useToastEffect } from "../../components/Toast.vue";
 import { useStore } from "vuex";
 
@@ -106,7 +106,7 @@ export default {
   },
   setup() {
     // 加减商品数量
-    const { cartList, shopId, ASItemToCart } = useCartEffect();
+    const { cartList, shopId, ASItemToCart } = useCartProASEffect();
     // 单选、全选、清空购物车
     const { handleProductCheck, handleAllCheck, handleClearCart } =
       useCartDetailEffect();
