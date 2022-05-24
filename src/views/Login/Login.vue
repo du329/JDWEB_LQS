@@ -115,7 +115,7 @@ export default {
       width: 100%;
       height: 0.48rem;
       background: #f9f9f9;
-      border: 1px solid rgba(0, 0, 0, 0.1);
+      border: 0.01rem solid rgba(0, 0, 0, 0.1);
       outline-color: $outLine-color;
       border-radius: 0.06rem;
       &::placeholder {
@@ -123,7 +123,7 @@ export default {
         font-size: 0.16rem;
         color: $color;
         letter-spacing: 0;
-        line-height: 24px;
+        line-height: 0.24rem;
       }
     }
     .pwd {
@@ -133,7 +133,7 @@ export default {
       margin-bottom: 0.16rem;
       width: 2.95rem;
       height: 0.48rem;
-      line-height: 24px;
+      line-height: 0.24rem;
       text-align: center;
       font-size: 0.16rem;
       background: $outLine-color;

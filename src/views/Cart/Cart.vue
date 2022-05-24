@@ -1,6 +1,6 @@
 <template>
-  <div>111</div>
-  <Navigation />
+  <div>cart</div>
+  <Navigation :currentIndex="1" />
 </template>
 
 <script>

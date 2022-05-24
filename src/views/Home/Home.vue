@@ -1,7 +1,7 @@
 <template>
   <StaticArea />
   <NearByShops />
-  <Navigation />
+  <Navigation :currentIndex="0"/>
 </template>
 
 <script>

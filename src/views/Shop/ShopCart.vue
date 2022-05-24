@@ -106,7 +106,7 @@ export default {
   width: 100%;
   height: 0.49rem;
   background: #fff;
-  box-shadow: 0 -1px 1px 0 #f1f1f1;
+  box-shadow: 0 -0.01rem 0.01rem 0 #f1f1f1;
   &__img {
     width: 0.76rem;
     text-align: center;

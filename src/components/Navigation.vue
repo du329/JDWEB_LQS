@@ -5,9 +5,8 @@
       :key="item.icon"
       :class="{
         Navigation__item: true,
-        'Navigation__item--active': item.index === 0 ? true : false,
+        'Navigation__item--active': item.index === currentIndex ? true : false,
       }"
-      data-index="{{item.index}}"
     >
       <router-link :to="item.to">
         <div class="iconfont" v-html="item.icon"></div>
@@ -20,11 +19,12 @@
 <script>
 export default {
   name: "Navigation",
+  props:['currentIndex'],
   setup() {
     let navigationList = [
       { index: 0, icon: "&#xe612;", text: "首页", to: { name: "Home" } },
       { index: 1, icon: "&#xe628;", text: "购物车", to: { name: "Cart" } },
-      { index: 2, icon: "&#xe606;", text: "订单", to: { name: "Home" } },
+      { index: 2, icon: "&#xe606;", text: "订单", to: { name: "Order" } },
       { index: 3, icon: "&#xe613;", text: "我的", to: { name: "Mine" } },
     ];
     return { navigationList };
@@ -44,8 +44,8 @@ export default {
   padding: 0.1rem 0.1rem 0.06rem 0.1rem;
   width: 100%;
   height: 0.49rem;
-  border-top: 1px solid $content-bgColor;
-  box-shadow: 0 -1px 1px 0 $content-bgColor;
+  border-top: 0.01rem solid $content-bgColor;
+  box-shadow: 0 -0.01rem 0.01rem 0 $content-bgColor;
   background: #fff;
   &__item {
     text-align: center;
@@ -57,9 +57,6 @@ export default {
     .iconfont {
       margin: 0.07rem 0 0.02rem 0;
       font-size: 0.2rem;
-    }
-    a {
-      color: #000;
     }
     .text {
       font-size: 0.2rem;

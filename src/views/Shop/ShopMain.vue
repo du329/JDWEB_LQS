@@ -210,14 +210,14 @@ export default {
           margin-bottom: 0.06rem;
           font-size: 0.12rem;
           color: $shop-color;
-          line-height: 16px;
+          line-height: 0.16rem;
         }
         &__price {
           &__yen {
             margin-right: 00.06rem;
             font-size: 0.16rem;
             color: #e93b3b;
-            line-height: 20px;
+            line-height: 0.2rem;
           }
           &__origin {
             font-size: 0.12rem;
@@ -237,7 +237,7 @@ export default {
           margin: 0 0.1rem;
           font-size: 0.14rem;
           color: $shop-color;
-          line-height: 16px;
+          line-height: 0.16rem;
         }
         &__add,
         &__sub {

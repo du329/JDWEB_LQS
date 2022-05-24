@@ -22,10 +22,14 @@
 
 ![](image/README/1652955599243.png)
 
-
-
 ## 计算属性return的数据直接使用，vue内部解析，
 
 computedRefImpl:  使用某个计算属性需要  computed.value
 
 ![](image/README/1653313436905.png)
+
+
+
+## vue2 生命周期--流程
+
+## vue3 setup（） -- 数据驱动

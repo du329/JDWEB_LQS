@@ -35,7 +35,7 @@ export default Vuex.createStore({
         shop.productList[productInfo._id] = product;
         state.cartList[shopId] = shop;
       }
-      setCartListToLS(state)
+      setCartListToLS(state);
     },
 
     // 单选
@@ -63,6 +63,15 @@ export default Vuex.createStore({
       setCartListToLS(state)
     },
 
+    // 清除提交订单的数据
+    clearCommittedData(state, payLoad) {
+      const { products, shopId } = payLoad;
+      for (const iterator of products) {
+        delete state.cartList[shopId].productList[iterator.id];
+        console.log(iterator.id);
+      }
+      setCartListToLS(state);
+    }
   },
   actions: {
   },

@@ -14,33 +14,36 @@
         <div class="iconfont">&#xe640;</div>
       </div>
     </div>
-    <div class="orderContent">
-      <div class="product__title">{{ shopName }}</div>
-      <div class="product">
-        <template v-for="item in checkedProductList" :key="item._id">
-          <div class="product__item">
-            <div class="product__item__img">
-              <img :src="item.imgUrl" alt="" />
-            </div>
-            <div class="product__item__detail">
-              <h4 class="product__item__detail__title">
-                {{ item.name }}
-              </h4>
-              <p class="product__item__detail__price">
-                <span class="product__item__detail__price__yen"
-                  >&yen;{{ item.price }} x {{ item.count }}</span
-                >
-              </p>
-            </div>
-            <div class="product__item__number">
-              <div class="product__item__number__val">
-                &yen;{{ (item.price * item.count).toFixed(2) }}
+    <div class="orderContentLayout">
+      <div class="orderContent">
+        <div class="product__title">{{ shopName }}</div>
+        <div class="product">
+          <template v-for="item in checkedProductList" :key="item._id">
+            <div class="product__item">
+              <div class="product__item__img">
+                <img :src="item.imgUrl" alt="" />
+              </div>
+              <div class="product__item__detail">
+                <h4 class="product__item__detail__title">
+                  {{ item.name }}
+                </h4>
+                <p class="product__item__detail__price">
+                  <span class="product__item__detail__price__yen"
+                    >&yen;{{ item.price }} x {{ item.count }}</span
+                  >
+                </p>
+              </div>
+              <div class="product__item__number">
+                <div class="product__item__number__val">
+                  &yen;{{ (item.price * item.count).toFixed(2) }}
+                </div>
               </div>
             </div>
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
     </div>
+
     <!-- 提交订单 -->
     <div class="Cashier">
       <div class="price">
@@ -53,19 +56,30 @@
     <div class="mask__content" @click.stop>
       <h4>确认要离开收银台？</h4>
       <p>请尽快完成支付，否则将被取消</p>
-      <div class="handle">
-        <div class="cancelOrder">取消订单</div>
-        <div class="comfirmPay">确认支付</div>
+      <div class="handleOrder">
+        <div class="cancelOrder" @click="handleComfirmPay(true)">取消订单</div>
+        <div class="comfirmPay" @click="handleComfirmPay(false)">确认支付</div>
       </div>
     </div>
   </div>
+
+  <transition
+    :duration="{ enter: 0, leave: 0 }"
+    enter-active-class="animate__animated animate__fadeIn"
+    leave-active-class="animate__animated animate__fadeOut"
+  >
+    <Toast v-if="show" :content="content" />
+  </transition>
 </template>
 
 <script>
 import { ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useCartDataEffect } from "../../effects/useCartDataEffect";
 import { useBackEffect } from "../../effects/useBackEffect";
+import { post } from "../../utils/request";
+import Toast, { useToastEffect } from "../../components/Toast"; // 自定义弹窗
+import { useStore } from "vuex";
 
 const useShowMaskEffect = () => {
   const showMask = ref(false);
@@ -75,8 +89,59 @@ const useShowMaskEffect = () => {
 
   return { handleShowMask, showMask };
 };
+
+const useHandleOrderEffect = (
+  shopId,
+  shopName,
+  checkedProductList,
+  showToast
+) => {
+  const router = useRouter();
+  const store = useStore();
+  // 确认订单
+  const handleComfirmPay = async (isCanceled) => {
+    try {
+      const products = [];
+      for (const i in checkedProductList.value) {
+        const product = {
+          id: checkedProductList.value[i]._id,
+          num: checkedProductList.value[i].count,
+        };
+        products.push(product);
+      }
+      const result = await post("/api/createOrder", {
+        addressId: "xxx",
+        shopId,
+        shopName: shopName.value,
+        isCanceled,
+        products,
+      });
+      if (result?.errno === 0 && !isCanceled) {
+        showToast("支付成功!");
+        store.commit("clearCommittedData", { products, shopId });
+        setTimeout(() => {
+          router.push({ name: "Order" });
+        }, 600);
+      } else {
+        showToast("支付失败!");
+      }
+      if (result?.errno === 0 && isCanceled) {
+        showToast("取消支付!");
+        store.commit("clearCommittedData", { products, shopId });
+        setTimeout(() => {
+          router.push({ name: "Order" });
+        }, 600);
+      }
+    } catch (error) {
+      showToast("请求失败!");
+    }
+  };
+  return { handleComfirmPay };
+};
+
 export default {
   name: "ConfirmOrder",
+  components: { Toast },
   setup() {
     const route = useRoute();
     const shopId = route.params.id;
@@ -90,10 +155,19 @@ export default {
     // 确认的商品、商铺名、总价
     const { checkedProductList, shopName, cartData } =
       useCartDataEffect(shopId);
-      // 回退
+    // 回退
     const { handleBack } = useBackEffect();
-    // 提交订单
+    // 吐司
+    const { show, content, showToast } = useToastEffect();
+    // 提交订单显示与隐藏
     const { handleShowMask, showMask } = useShowMaskEffect();
+    // 取消订单与确认订单
+    const { handleComfirmPay } = useHandleOrderEffect(
+      shopId,
+      shopName,
+      checkedProductList,
+      showToast
+    );
 
     return {
       shopId,
@@ -104,6 +178,10 @@ export default {
       handleBack,
       handleShowMask,
       showMask,
+      handleComfirmPay,
+      show,
+      content,
+      showToast,
     };
   },
 };
@@ -122,7 +200,7 @@ export default {
 }
 .topArea {
   position: relative;
-  padding: 0.465rem 0.16rem 0;
+  padding: 0.245rem 0.16rem 0;
   width: 100%;
   height: 1.46rem;
   background-image: linear-gradient(0deg, rgba(0, 145, 255, 0) 4%, #0091ff 45%);
@@ -134,7 +212,7 @@ export default {
   .title {
     margin-bottom: 0.22rem;
     text-align: center;
-    font-size: 16px;
+    font-size: 0.16rem;
     color: #ffffff;
   }
 
@@ -145,7 +223,7 @@ export default {
     padding: 0.16rem;
     width: 100%;
     background: #ffffff;
-    border-radius: 4px;
+    border-radius: 0.04rem;
     &__title {
       margin-bottom: 0.14rem;
       font-size: 0.16rem;
@@ -169,69 +247,72 @@ export default {
     }
   }
 }
-
-.orderContent {
-  position: relative;
-  margin: 0.62rem auto 0;
-  padding: 0.16rem 0.16rem 0;
-  width: 3.39rem;
-  background: #fff;
-  border-radius: 4px;
-  .product__title {
-    margin-bottom: 0.16rem;
+.orderContentLayout {
+  padding: 0 0.16rem;
+  .orderContent {
+    position: relative;
+    margin-top: 0.40rem;
+    padding: 0.16rem 0.16rem 0;
+    width: 100%;
     background: #fff;
-    font-weight: 700;
-    font-size: 16px;
-    color: #333333;
-  }
-  .product {
-    flex: 1;
-    overflow: auto;
-    &__item {
-      position: relative;
-      display: flex;
+    border-radius: 0.04rem;
+    .product__title {
       margin-bottom: 0.16rem;
-      &__img {
-        margin-right: 0.16rem;
-        width: 0.46rem;
-        height: 0.46rem;
-        img {
-          width: 100%;
-        }
-      }
-      &__detail {
-        flex: 1;
-        overflow: hidden;
-        &__title {
-          @include ellipsis;
-          margin: 0.04rem 0 0.06rem 0;
-          font-size: 0.14rem;
-          color: $shop-color;
-        }
-        &__price {
-          &__yen {
-            margin-right: 00.06rem;
-            font-size: 0.16rem;
-            color: #e93b3b;
-            line-height: 20px;
+      background: #fff;
+      font-weight: 700;
+      font-size: 0.16rem;
+      color: #333333;
+    }
+    .product {
+      flex: 1;
+      overflow: auto;
+      &__item {
+        position: relative;
+        display: flex;
+        margin-bottom: 0.16rem;
+        &__img {
+          margin-right: 0.16rem;
+          width: 0.46rem;
+          height: 0.46rem;
+          img {
+            width: 100%;
           }
         }
-      }
-      &__number {
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        display: flex;
-        align-items: center;
-        &__val {
-          font-size: 0.14rem;
-          color: #000;
-          line-height: 16px;
+        &__detail {
+          flex: 1;
+          overflow: hidden;
+          &__title {
+            @include ellipsis;
+            margin: 0.04rem 0 0.06rem 0;
+            font-size: 0.14rem;
+            color: $shop-color;
+          }
+          &__price {
+            &__yen {
+              margin-right: 00.06rem;
+              font-size: 0.16rem;
+              color: #e93b3b;
+              line-height: 0.2rem;
+            }
+          }
+        }
+        &__number {
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          display: flex;
+          align-items: center;
+          &__val {
+            font-size: 0.14rem;
+            color: #000;
+            line-height: 0.16rem;
+          }
         }
       }
     }
   }
 }
+
 .Cashier {
   position: fixed;
   display: flex;
@@ -275,7 +356,7 @@ export default {
     height: 1.57rem;
     text-align: center;
     background: #ffffff;
-    border-radius: 4px;
+    border-radius: 0.04rem;
     h4 {
       margin-bottom: 0.08rem;
       font-size: 0.18rem;
@@ -286,7 +367,7 @@ export default {
       font-size: 0.14rem;
       color: #666666;
     }
-    .handle {
+    .handleOrder {
       display: flex;
       justify-content: center;
       .cancelOrder,
@@ -294,7 +375,7 @@ export default {
         width: 0.8rem;
         height: 0.32rem;
         line-height: 0.32rem;
-        border: 1px solid #4fb0f9;
+        border: 0.01rem solid #4fb0f9;
         border-radius: 0.16rem;
       }
       .cancelOrder {
