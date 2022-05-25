@@ -10,7 +10,7 @@ const Mine = () => import(/* webpackChunkName: "Mine" */ '../views/Mine/Mine')
 
 const routes = [
   {
-  path: '/Login',
+  path: '/',
   name: 'Login',
   component: Login,
   // 独享守卫：
