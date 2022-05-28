@@ -7,6 +7,9 @@ const Shop = () => import(/* webpackChunkName: "Shop" */ '../views/Shop/Shop')
 const Order = () => import(/* webpackChunkName: "Order" */ '../views/Order/Order')
 const ConfirmOrder = () => import(/* webpackChunkName: "ConfirmOrder" */ '../views/Order/ConfirmOrder')
 const Mine = () => import(/* webpackChunkName: "Mine" */ '../views/Mine/Mine')
+const CreateAddress = () => import(/* webpackChunkName: "CreateAddress" */ '../views/Address/CreateAddress')
+const EditAddress = () => import(/* webpackChunkName: "EditAddress" */ '../views/Address/EditAddress')
+const MangeAddress = () => import(/* webpackChunkName: "MangeAddress" */ '../views/Address/MangeAddress')
 
 const routes = [
   {
@@ -59,6 +62,18 @@ const routes = [
   path: '/Mine',
   name: 'Mine',
   component: Mine,
+},{
+  path: '/CreateAddress',
+  name: 'CreateAddress',
+  component: CreateAddress,
+},{
+  path: '/EditAddress',
+  name: 'EditAddress',
+  component: EditAddress,
+},{
+  path: '/MangeAddress',
+  name: 'MangeAddress',
+  component: MangeAddress,
 }]
 
 const router = createRouter({

@@ -2,28 +2,50 @@
   <div class="mineLayout">
     <div class="topArea"></div>
     <div class="mineContent">
-      <div class="userInfoMofify"></div>
+      <div class="userInfoMofify">
+        <img src="./Mine-img/editor.png" alt="" />
+      </div>
       <div class="userMessage">
-        <div class="userHead"><img src="" alt="" /></div>
+        <div class="userHead"><img src="./Mine-img/avatar.jpg" alt="" /></div>
         <div class="userName">热心市民林先生</div>
         <div class="userId">ID: 19145314</div>
         <div class="userWallet">
-          <div class="userWallet__item">
-            <div class="userWallet__item__title"></div>
-            <div class="userWallet__item__value"></div>
+          <div
+            class="userWallet__item"
+            v-for="(item, index) in list"
+            :key="item.title"
+          >
+            <div class="userWallet__item__title">
+              {{ item.title }}
+            </div>
+            <div class="userWallet__item__value">
+              {{ index === 1 ? `${item.value}张` : item.value }}
+            </div>
           </div>
         </div>
       </div>
       <div class="mineFunction">
-        <div
-          class="mineFunction__item"
-          v-for="item in mineFunctionList"
-          :key="item.imgURl"
-        >
-          <div class="mineFunction__item__img">
-            <img :src="item.imgURl" alt="" />
+        <div class="mineFunction__item">
+          <div class="mineFunction__item__img money">
+            <img src="./Mine-img/money.png" alt="" />
           </div>
-          <div class="mineFunction__item__name">{{ item.name }}</div>
+          <div class="mineFunction__item__name">我的钱包</div>
+          <div class="mineFunction__item__icon iconfont">&#xe640;</div>
+        </div>
+        <router-link :to="{ name: 'MangeAddress' }">
+          <div class="mineFunction__item">
+            <div class="mineFunction__item__img address">
+              <img src="./Mine-img/address.png" alt="" />
+            </div>
+            <div class="mineFunction__item__name">我的地址</div>
+            <div class="mineFunction__item__icon iconfont">&#xe640;</div>
+          </div>
+        </router-link>
+        <div class="mineFunction__item">
+          <div class="mineFunction__item__img help">
+            <img src="./Mine-img/help.png" alt="" />
+          </div>
+          <div class="mineFunction__item__name">客服与帮助</div>
           <div class="mineFunction__item__icon iconfont">&#xe640;</div>
         </div>
       </div>
@@ -33,20 +55,31 @@
 </template>
 
 <script>
-import { reactive } from "@vue/reactivity";
+import { reactive, toRefs } from "@vue/reactivity";
 import Navigation from "../../components/Navigation.vue";
+import { post } from "../../utils/request";
+
+const useMineDataEffect = () => {
+  const data = reactive({ list: [] });
+  const getMineData = async () => {
+    const result = await post("/mine/userWallet");
+    if (result.errno === 0) {
+      data.list = result.data;
+    }
+  };
+  getMineData();
+  const { list } = toRefs(data);
+  return { list };
+};
+
 export default {
   name: "Mine",
   components: {
     Navigation,
   },
   setup() {
-    const mineFunctionList = reactive([
-      { imgURl: './Mine-img/money.png', name: "我的钱包" },
-      { imgURl: "./Mine-img/address.png", name: "我的地址" },
-      { imgURl: "./Mine-img/help.png", name: "客服与帮助" },
-    ]);
-    return { mineFunctionList };
+    const { list } = useMineDataEffect();
+    return { list };
   },
 };
 </script>
@@ -77,15 +110,65 @@ export default {
       right: 0.18rem;
       width: 0.25rem;
       height: 0.25rem;
-      background: #000;
+      color: #fff;
+      img {
+        width: 100%;
+      }
     }
     .userMessage {
+      display: flex;
+      flex-direction: column;
       margin-bottom: 0.16rem;
+      align-items: center;
+      padding-top: 0.59rem;
       width: 100%;
-      height: 2.03rem;
+      height: 1.99rem;
       background: #fff;
       box-shadow: 0 0.08rem 0.16rem 0 rgba(0, 0, 0, 0.08);
       border-radius: 0.08rem;
+      .userHead {
+        // transform: translateY(-50%);
+        position: absolute;
+        top: -0.47rem;
+        margin: 0 auto;
+        width: 0.94rem;
+        height: 0.94rem;
+        border-radius: 50%;
+        overflow: hidden;
+        img {
+          width: 100%;
+        }
+      }
+      .userName {
+        margin-bottom: 0.02rem;
+        font-size: 0.24rem;
+        color: #262628;
+        letter-spacing: 0.19px;
+      }
+      .userId {
+        margin-bottom: 0.12rem;
+        font-size: 0.14rem;
+        color: #c1c0c9;
+      }
+      .userWallet {
+        padding-top: 0.12rem;
+        display: flex;
+        border-top: 0.01rem solid #f1f1f1;
+        width: 100%;
+        &__item {
+          width: 25%;
+          text-align: center;
+          &__title {
+            margin-bottom: 0.08rem;
+            font-size: 0.12rem;
+            color: #c1c0c9;
+          }
+          &__value {
+            font-size: 0.2rem;
+            color: #262628;
+          }
+        }
+      }
     }
     .mineFunction {
       width: 100%;
@@ -99,12 +182,20 @@ export default {
         align-items: center;
         height: 0.5rem;
         background: #fff;
+        .money {
+          background: #ed4a47;
+        }
+        .address {
+          background: #32c5ff;
+        }
+        .help {
+          background: rgba(144, 19, 254, 0.92);
+        }
         &__img {
           margin-right: 0.12rem;
           padding: 0.05rem;
           width: 0.22rem;
           height: 0.22rem;
-          background: #ed4a47;
           border-radius: 0.08rem;
           img {
             width: 100%;
