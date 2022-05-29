@@ -119,7 +119,7 @@ export default {
 }
 // 搜索
 .searchBox {
-  padding: 0 5%;
+  padding: 0 0.16rem;
 }
 // banner
 .banner {

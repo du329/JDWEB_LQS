@@ -25,11 +25,11 @@ export const useCartDataEffect = (shopId, handleCartShow = "") => {
         return cPL;
     })
 
-    // 某个 商店购物车 选中商品列表
+    // 购物车 选中商品列表
     const checkedCartList = computed(() => {
         // 筛选后的购物车
         const cList = {};
-     
+
         for (const id of Object.keys(cartList)) {
             const obj = {};
             // 筛选后的商品列表
@@ -43,10 +43,12 @@ export const useCartDataEffect = (shopId, handleCartShow = "") => {
                     }
                 }
             }
+            if (Object.keys(productList).length) {
+                obj['shopName'] = cartList?.[id]?.shopName;
+                obj['productList'] = productList;
+                cList[id] = obj;
+            }
 
-            obj['shopName'] = cartList?.[id]?.shopName;
-            obj['productList'] = productList;
-            cList[id] = obj;
         }
         return cList;
     })

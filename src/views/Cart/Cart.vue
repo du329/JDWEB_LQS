@@ -2,37 +2,35 @@
   <div class="cartLayout">
     <div class="cartTitle">我的全部购物车 ({{ cartNumber }})</div>
     <div class="cartList">
-      <div
-        class="cartitem"
-        v-for="cart in checkedCartList"
-        :key="cart.shopName"
-      >
-        <div class="product__title">{{ cart.shopName }}</div>
-        <div class="product">
-          <template v-for="item in cart.productList" :key="item._id">
-            <div class="product__item">
-              <div class="product__item__img">
-                <img :src="item.imgUrl" alt="" />
-              </div>
-              <div class="product__item__detail">
-                <h4 class="product__item__detail__title">
-                  {{ item.name }}
-                </h4>
-                <p class="product__item__detail__price">
-                  <span class="product__item__detail__price__yen"
-                    >&yen;{{ item.price }} x {{ item.count }}</span
-                  >
-                </p>
-              </div>
-              <div class="product__item__number">
-                <div class="product__item__number__val">
-                  &yen;{{ (item.price * item.count).toFixed(2) }}
+      <template v-for="cart in checkedCartList" :key="cart.shopName">
+        <div class="cartitem">
+          <div class="product__title">{{ cart.shopName }}</div>
+          <div class="product">
+            <template v-for="item in cart.productList" :key="item._id">
+              <div class="product__item">
+                <div class="product__item__img">
+                  <img :src="item.imgUrl" alt="" />
+                </div>
+                <div class="product__item__detail">
+                  <h4 class="product__item__detail__title">
+                    {{ item.name }}
+                  </h4>
+                  <p class="product__item__detail__price">
+                    <span class="product__item__detail__price__yen"
+                      >&yen;{{ item.price }} x {{ item.count }}</span
+                    >
+                  </p>
+                </div>
+                <div class="product__item__number">
+                  <div class="product__item__number__val">
+                    &yen;{{ (item.price * item.count).toFixed(2) }}
+                  </div>
                 </div>
               </div>
-            </div>
-          </template>
+            </template>
+          </div>
         </div>
-      </div>
+      </template>
     </div>
   </div>
   <Navigation :currentIndex="1" />
@@ -49,6 +47,7 @@ export default {
   setup() {
     const shopId = 1;
     const { checkedCartList } = useCartDataEffect(shopId);
+    console.log(checkedCartList);
     const cartNumber = Object.keys(checkedCartList.value).length;
     return { cartNumber, checkedCartList };
   },
@@ -66,10 +65,15 @@ export default {
     color: #333333;
     background: #fff;
   }
-
   .cartList {
+    position: absolute;
     padding: 0.16rem 0.18rem 0.49rem;
-    width: 100%;
+    top: 0.44rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+    background: #f8f5f5;
     border-radius: 0.04rem;
     .cartitem {
       padding: 0.16rem 0.16rem 0;

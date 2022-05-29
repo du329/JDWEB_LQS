@@ -13,68 +13,68 @@ const MangeAddress = () => import(/* webpackChunkName: "MangeAddress" */ '../vie
 
 const routes = [
   {
-  path: '/',
-  name: 'Login',
-  component: Login,
-  // 独享守卫：
-  beforeEnter(to, from, next) {
-    if (localStorage.isLogin) {
-      next({ name: from.name });
-      alert('您已成功登录！');
-    } else {
-      next();
+    path: '/',
+    name: 'Login',
+    component: Login,
+    // 独享守卫：
+    beforeEnter(to, from, next) {
+      if (localStorage.isLogin) {
+        next({ name: 'Home' });
+        alert('您已成功登录！');
+      } else {
+        next();
+      }
     }
-  }
-}, {
-  path: '/Register',
-  name: 'Register',
-  component: Register,
-  // 独享守卫：
-  beforeEnter(to, from, next) {
-    if (localStorage.isLogin) {
-      next({ name: from.name });
-      alert('您已成功登录！');
-    } else {
-      next();
+  }, {
+    path: '/Register',
+    name: 'Register',
+    component: Register,
+    // 独享守卫：
+    beforeEnter(to, from, next) {
+      if (localStorage.isLogin) {
+        next({ name: 'Home' });
+        alert('您已成功登录！');
+      } else {
+        next();
+      }
     }
-  }
-}, {
-  path: '/Home',
-  name: 'Home',
-  component: Home,
-}, {
-  path: '/Cart',
-  name: 'Cart',
-  component: Cart,
-}, {
-  path: '/Shop/:id',
-  name: 'Shop',
-  component: Shop,
-},{
-  path: '/Order',
-  name: 'Order',
-  component: Order,
-},{
-  path: '/ConfirmOrder/:id',
-  name: 'ConfirmOrder',
-  component: ConfirmOrder,
-},{
-  path: '/Mine',
-  name: 'Mine',
-  component: Mine,
-},{
-  path: '/CreateAddress',
-  name: 'CreateAddress',
-  component: CreateAddress,
-},{
-  path: '/EditAddress',
-  name: 'EditAddress',
-  component: EditAddress,
-},{
-  path: '/MangeAddress',
-  name: 'MangeAddress',
-  component: MangeAddress,
-}]
+  }, {
+    path: '/Home',
+    name: 'Home',
+    component: Home,
+  }, {
+    path: '/Cart',
+    name: 'Cart',
+    component: Cart,
+  }, {
+    path: '/Shop/:id',
+    name: 'Shop',
+    component: Shop,
+  }, {
+    path: '/Order',
+    name: 'Order',
+    component: Order,
+  }, {
+    path: '/ConfirmOrder/:id',
+    name: 'ConfirmOrder',
+    component: ConfirmOrder,
+  }, {
+    path: '/Mine',
+    name: 'Mine',
+    component: Mine,
+  }, {
+    path: '/CreateAddress',
+    name: 'CreateAddress',
+    component: CreateAddress,
+  }, {
+    path: '/EditAddress',
+    name: 'EditAddress',
+    component: EditAddress,
+  }, {
+    path: '/MangeAddress',
+    name: 'MangeAddress',
+    component: MangeAddress,
+  }]
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -92,7 +92,9 @@ router.beforeEach((to, from, next) => {
     next({ name: 'Login' });
     // 游览器历史记录
   }
-})
+});
+
+// 组件守卫：通过路由规则，路由之间切换Enter | leave
 export default router;
 
 // vue的路由懒加载配置

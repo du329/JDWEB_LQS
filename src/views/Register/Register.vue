@@ -149,7 +149,7 @@ export default {
     }
     .submit {
       margin: 0.16rem 0;
-      width: 2.95rem;
+         width: 100%;
       height: 0.48rem;
       line-height: 0.24rem;
       text-align: center;
